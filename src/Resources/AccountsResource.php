@@ -11,7 +11,9 @@ class AccountsResource extends AbstractResource
     /**
      * Получить список счетов
      *
-     * @return Account[]  // Или Collection<Account>
+     * @param array $filters Фильтр на будущее
+     *
+     * @return array
      */
     public function all(array $filters = []): array
     {
@@ -36,8 +38,27 @@ class AccountsResource extends AbstractResource
         return $accounts;
     }
 
-    public function findById($id)
+    /**
+     * Получить счет по указанному ID
+     *
+     * @param $id
+     *
+     * @return Account|null
+     */
+    public function findById($id): ?Account
     {
-        // TODO: Implement findById() method.
+        // Получаем все счета
+        $accounts = $this->all();
+
+        // Ищем нужный счёт
+        foreach ($accounts as $account) {
+            if ($account->id === (string)$id) {
+                // Возвращаем найденный объект Account
+                return $account;
+            }
+        }
+
+        // Если ничего не нашли — возвращаем null
+        return null;
     }
 }

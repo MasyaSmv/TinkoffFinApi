@@ -27,25 +27,31 @@ class TinkoffFinApiClient implements ClientContract
     }
 
     /**
-     * Пример геттер – возвращаем TinkoffClientsFactory для внутренней работы ресурсов.
+     * Возвращает класс клиента соединение с Тинькофф АПИ
+     *
+     * @return TinkoffClientsFactory
      */
-    public function getClient(): object
+    public function getClient(): TinkoffClientsFactory
     {
         return $this->client;
     }
 
     /**
-     * Ресурс: Счета
+     * Возвращает все счета полученные от Тинькофф Апи
+     *
+     * @return AccountsResource
      */
-    public function accounts(): AccountsResource
+    public function getAccounts(): AccountsResource
     {
         return new AccountsResource($this);
     }
 
     /**
-     * Ресурс: Операции
+     * Возвращает все операции полученные от Тинькофф Апи
+     *
+     * @return OperationsResource
      */
-    public function operations(): OperationsResource
+    public function getOperations(): OperationsResource
     {
         return new OperationsResource($this);
     }
