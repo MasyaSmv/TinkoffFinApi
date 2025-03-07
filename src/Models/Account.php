@@ -89,31 +89,6 @@ class Account extends AbstractModel
     }
 
     /**
-     *  Преобразует поле из GrpcAccount в Carbon или null,
-     *  если поле отсутствует либо содержит 0.
-     *
-     * @param Timestamp|null $timestamp
-     *
-     * @return Carbon|null
-     */
-    private function makeCarbon(?Timestamp $timestamp): ?Carbon
-    {
-        if (!$timestamp) {
-            return null;
-        }
-
-        $seconds = $timestamp->getSeconds();
-        $nanos = $timestamp->getNanos();
-
-        // Проверяем «нулевую» дату
-        if ($seconds === 0 && $nanos === 0) {
-            return null;
-        }
-
-        return Carbon::createFromTimestamp($seconds);
-    }
-
-    /**
      * Получить операции за все время по данному счету
      *
      * @return Operation[]

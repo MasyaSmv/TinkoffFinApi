@@ -22,7 +22,7 @@ class OperationsResource extends AbstractResource
         $accounts = $this->client->getAccounts()->all();
         foreach ($accounts as $account) {
             $operation = $account->getFindByIdOperation($id);
-            
+
             if ($operation) {
                 return $operation;
             }
@@ -62,57 +62,45 @@ class OperationsResource extends AbstractResource
      */
     public function getByDateRange(string $accountId, ?Carbon $from = null, ?Carbon $to = null): array
     {
-        // Устанавливаем максимальное значение from по умолчанию (начало эпохи)
-        $from = $from ?? Carbon::createFromTimestamp(0);
-        // Если to не передано, ставим текущую дату
-        $to = $to ?? Carbon::now();
+        // Если from или to не заданы, устанавливаем значения по умолчанию
+        $from ??= Carbon::createFromTimestamp(0);
+        $to ??= Carbon::now();
 
         $operations = [];
-        $cursor = ''; // Начинаем с пустого курсора
+        $cursor = '';
 
         do {
             $request = new GetOperationsByCursorRequest();
 
-            // Устанавливаем from и to
-            $fromTimestamp = new Timestamp();
-            $fromTimestamp->setSeconds($from->getTimestamp());
-            $request->setFrom($fromTimestamp);
+            // Создаем объекты Timestamp и сразу инициализируем их
+            $request->setFrom(tap(new Timestamp(), static fn(Timestamp $ts) => $ts->setSeconds($from->getTimestamp())));
+            $request->setTo(tap(new Timestamp(), static fn(Timestamp $ts) => $ts->setSeconds($to->getTimestamp())));
 
-            $toTimestamp = new Timestamp();
-            $toTimestamp->setSeconds($to->getTimestamp());
-            $request->setTo($toTimestamp);
-
-            // Устанавливаем счёт
             $request->setAccountId($accountId);
-
-            // Устанавливаем курсор (если он есть)
             $request->setCursor($cursor);
-
-            // Устанавливаем лимит (по API Тинькофф можно до 100)
             $request->setLimit(100);
 
-            // Вызываем API
-            [$response, $status] = $this->callApi(
-                fn() => $this->client->getClient()
-                    ->operationsServiceClient
-                    ->GetOperationsByCursor($request)
-                    ->wait(),
+            // Вызываем API и получаем ответ
+            [$response, $status] = $this->callApi(fn() => $this->client->getClient()
+                ->operationsServiceClient
+                ->GetOperationsByCursor($request)
+                ->wait(),
             );
 
-            // Если запрос неуспешен — бросаем исключение
-            if ($status->code !== 0) {
-                throw new TinkoffApiException("Error code: {$status->code}");
-            }
+            // Используем конструкцию match для проверки статуса и выбрасывания исключения в одну строчку
+            match ($status->code) {
+                0 => null,
+                default => throw new TinkoffApiException("Error code: {$status->code}"),
+            };
 
-            // Обрабатываем операции
+            // Обрабатываем полученные операции
             foreach ($response->getItems() as $op) {
-                $operations[] = new Operation($op);
+                $operations[] = new Operation($op, $this->client);
             }
 
-            // Берем новый курсор и проверяем, есть ли ещё страницы
+            // Получаем курсор для следующей страницы
             $cursor = $response->getNextCursor();
-            $hasNext = $response->getHasNext();
-        } while ($hasNext);
+        } while ($response->getHasNext());
 
         return $operations;
     }
