@@ -27,7 +27,7 @@ class OperationsResource extends AbstractResource
         // ... заполнить $to
 
         [$response, $status] = $this->callApi(
-            fn() => $this->client->getTinkoffClient()
+            fn() => $this->client->getClient()
                 ->operationsServiceClient
                 ->GetOperations($request)
                 ->wait()

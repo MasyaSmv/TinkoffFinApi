@@ -18,7 +18,7 @@ class AccountsResource extends AbstractResource
         $request = new GetAccountsRequest();
 
         [$response, $status] = $this->callApi(
-            fn() => $this->client->getTinkoffClient()
+            fn() => $this->client->getClient()
                 ->usersServiceClient
                 ->GetAccounts($request)
                 ->wait()

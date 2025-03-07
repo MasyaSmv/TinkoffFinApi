@@ -4,5 +4,5 @@ namespace TinkoffFinApi\Contracts;
 
 interface ClientContract
 {
-    public function getTinkoffClient();
+    public function getClient();
 }
