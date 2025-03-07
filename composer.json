@@ -22,7 +22,8 @@
   },
   "autoload": {
     "psr-4": {
-      "TinkoffFinApi\\Services\\": "src/Client/",
+      "TinkoffFinApi\\Client\\": "src/Client/",
+      "TinkoffFinApi\\Services\\": "src/Services/",
       "TinkoffFinApi\\Contracts\\": "src/Contracts/",
       "TinkoffFinApi\\Models\\": "src/Models/",
       "TinkoffFinApi\\Resources\\": "src/Resources/",
