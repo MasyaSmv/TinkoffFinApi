@@ -13,7 +13,7 @@ class AccountsResource extends AbstractResource
      *
      * @param array $filters Фильтр на будущее
      *
-     * @return array
+     * @return Account[]
      */
     public function all(array $filters = []): array
     {
@@ -32,7 +32,7 @@ class AccountsResource extends AbstractResource
 
         $accounts = [];
         foreach ($response->getAccounts() as $acc) {
-            $accounts[] = new Account($acc); // DTO инициализируем
+            $accounts[] = new Account($acc, $this->client); // DTO инициализируем
         }
 
         return $accounts;

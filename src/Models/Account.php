@@ -5,6 +5,8 @@ namespace TinkoffFinApi\Models;
 use Carbon\Carbon;
 use Google\Protobuf\Timestamp;
 use Tinkoff\Invest\V1\Account as GrpcAccount;
+use TinkoffFinApi\Client\TinkoffFinApiClient;
+use TinkoffFinApi\Resources\OperationsResource;
 
 class Account extends AbstractModel
 {
@@ -71,9 +73,12 @@ class Account extends AbstractModel
 
     /**
      * @param GrpcAccount $grpcAccount
+     * @param TinkoffFinApiClient $client
      */
-    public function __construct(GrpcAccount $grpcAccount)
+    public function __construct(GrpcAccount $grpcAccount, TinkoffFinApiClient $client)
     {
+        parent::__construct($client);
+        
         $this->id = $grpcAccount->getId();
         $this->status = $grpcAccount->getStatus();
         $this->name = $grpcAccount->getName();
@@ -106,5 +111,44 @@ class Account extends AbstractModel
         }
 
         return Carbon::createFromTimestamp($seconds);
+    }
+
+    /**
+     * Получить операции за все время по данному счету
+     *
+     * @return Operation[]
+     */
+    public function getAllOperations(): array
+    {
+        return (new OperationsResource($this->client))->all(['accountId' => $this->id]);
+    }
+
+    /**
+     * Получить операцию по ID, если она есть 
+     * 
+     * @param $id
+     *
+     * @return Operation|null
+     */
+    public function getFindByIdOperation($id): ?Operation
+    {
+        foreach ($this->getAllOperations() as $operation) {
+            if ($operation->id === $id) {
+                return $operation;
+            }
+        }
+        
+        return null;
+    }
+
+    /**
+     * @param Carbon|null $from
+     * @param Carbon|null $to
+     *
+     * @return Operation[]
+     */
+    public function getByDateRangeOperations(?Carbon $from = null, ?Carbon $to = null): array
+    {
+        return (new OperationsResource($this->client))->getByDateRange($this->id, $from, $to);
     }
 }
