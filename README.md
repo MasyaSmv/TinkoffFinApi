@@ -1,8 +1,6 @@
 # TinkoffFinApi
 
-TinkoffFinApi — это PHP-библиотека, упрощающая работу с Tinkoff API для различных FIN-проектов. Она содержит готовые
-классы и методы для удобного доступа к данным о счетах, операциях и другим ресурсам, а также обеспечивает быструю и
-легкую интеграцию с фреймворком Laravel.
+TinkoffFinApi — это PHP-библиотека, упрощающая работу с Tinkoff API для различных FIN-проектов. Она содержит готовые классы и методы для удобного доступа к данным о счетах, операциях и другим ресурсам, а также обеспечивает быструю и легкую интеграцию с фреймворком Laravel.
 
 ---
 
@@ -10,9 +8,16 @@ TinkoffFinApi — это PHP-библиотека, упрощающая рабо
 
 - [Особенности](#особенности)
 - [Установка](#установка)
-- [Быстрый старт](#быстрый-старт)
-    - [Настройка клиента](#настройка-клиента)
-    - [Работа с ресурсами](#работа-с-ресурсами)
+- [Быстрый-start](#быстрый-старт)
+  - [Настройка клиента](#настройка-клиента)
+  - [Работа с ресурсами](#работа-с-ресурсами)
+    - [Получение списка счетов](#получение-списка-счетов)
+    - [Получение конкретного счета](#получение-конкретного-счета)
+    - [Работа с операциями](#работа-с-операциями)
+      - [Получение всех операций](#получение-всех-операций)
+      - [Получение операции по ID](#получение-операции-по-id)
+      - [Получение операций за период](#получение-операций-за-период)
+      - [Получение операций через ресурс Account](#получение-операций-через-ресурс-account)
 - [Обработка ошибок](#обработка-ошибок)
 - [Интеграция с Laravel](#интеграция-с-laravel)
 - [Структура проекта](#структура-проекта)
@@ -24,15 +29,12 @@ TinkoffFinApi — это PHP-библиотека, упрощающая рабо
 
 ## Особенности
 
-- **Управление API-токеном и соединением.** Библиотека предоставляет клиентский класс для хранения токена и настройки
-  всех API-запросов.
-- **Работа с ресурсами.** Специализированные классы (Resources) облегчают доступ к сущностям, таким как счета (Accounts)
-  и операции (Operations).
+- **Управление API-токеном и соединением.** Библиотека предоставляет клиентский класс для хранения токена и настройки всех API-запросов.
+- **Работа с ресурсами.** Специализированные классы (Resources) облегчают доступ к сущностям, таким как счета (Accounts) и операции (Operations).
 - **Чёткие DTO-модели.** Объектные модели упрощают чтение и работу с данными, обеспечивая лучшую структуру.
 - **Кастомные исключения.** Позволяют грамотно обрабатывать ошибки (например, при неверном или истекшем токене).
 - **Интерфейсы.** Обеспечивают гибкую архитектуру и дают возможность при необходимости легко расширять функционал.
-- **Интеграция с Laravel.** Сервис-провайдер для упрощения регистрации и использования библиотеки в вашем
-  Laravel-приложении.
+- **Интеграция с Laravel.** Сервис-провайдер для упрощения регистрации и использования библиотеки в вашем Laravel-приложении.
 - **Тестирование.** Набор юнит- и функциональных тестов для проверки стабильности и корректности работы.
 
 ---
@@ -45,8 +47,7 @@ TinkoffFinApi — это PHP-библиотека, упрощающая рабо
 composer require fin/tinkoff-api
 ```
 
-> **Примечание:** Убедитесь, что в вашем проекте уже установлен Composer. Если нет, перейдите
-> по [ссылке](https://getcomposer.org/) и следуйте официальной инструкции.
+> **Примечание:** Убедитесь, что в вашем проекте уже установлен Composer. Если нет, перейдите по [ссылке](https://getcomposer.org/) и следуйте официальной инструкции.
 
 ---
 
@@ -70,13 +71,12 @@ $client = new TinkoffFinApiClient($apiToken);
 ```
 
 В данном примере:
-
 - **$apiToken** — это строка, содержащая ваш реальный токен доступа от Tinkoff.
 - **TinkoffFinApiClient** отвечает за конфигурацию и управление всеми запросами к API.
 
 ### Работа с ресурсами
 
-#### Получение списка счетов
+#### [Получение списка счетов](#получение-списка-счетов)
 
 ```php
 <?php
@@ -101,7 +101,7 @@ try {
 }
 ```
 
-#### Получение конкретного счета
+#### [Получение конкретного счета](#получение-конкретного-счета)
 
 ```php
 <?php
@@ -129,7 +129,89 @@ try {
 }
 ```
 
-#### Работа с операциями
+### Работа с операциями
+
+##### [Получение всех операций](#получение-всех-операций)
+
+```php
+<?php
+use Carbon\Carbon;
+use TinkoffFinApi\Client\TinkoffFinApiClient;
+use TinkoffFinApi\Exceptions\TinkoffApiException;
+
+$apiToken = 'YOUR_API_TOKEN_HERE';
+
+try {
+    $client = new TinkoffFinApiClient($apiToken);
+
+    // Получаем ресурс операций
+    $operations = $client->getOperations();
+
+    // Получение всех операций
+    foreach ($operations->all() as $operation) {
+        echo 'Operation ID: ' . $operation->id . ' | Тип: ' . $operation->type . PHP_EOL;
+    }
+} catch (TinkoffApiException $e) {
+    echo 'Ошибка при работе с операциями: ' . $e->getMessage();
+}
+```
+
+##### [Получение операции по ID](#получение-операции-по-id)
+
+```php
+<?php
+use TinkoffFinApi\Client\TinkoffFinApiClient;
+use TinkoffFinApi\Exceptions\TinkoffApiException;
+
+$apiToken = 'YOUR_API_TOKEN_HERE';
+$operationId = 'YOUR_OPERATION_ID';
+
+try {
+    $client = new TinkoffFinApiClient($apiToken);
+    $operations = $client->getOperations();
+
+    // Получаем операцию по ID
+    $singleOperation = $operations->findById($operationId);
+    if ($singleOperation) {
+        echo 'Найдена операция: ' . $singleOperation->id . PHP_EOL;
+    } else {
+        echo 'Операция с таким ID не найдена.' . PHP_EOL;
+    }
+} catch (TinkoffApiException $e) {
+    echo 'Ошибка при работе с операциями: ' . $e->getMessage();
+}
+```
+
+##### [Получение операций за период](#получение-операций-за-период)
+
+```php
+<?php
+use Carbon\Carbon;
+use TinkoffFinApi\Client\TinkoffFinApiClient;
+use TinkoffFinApi\Exceptions\TinkoffApiException;
+
+$apiToken = 'YOUR_API_TOKEN_HERE';
+$accountId = 'YOUR_ACCOUNT_ID';
+
+try {
+    $client = new TinkoffFinApiClient($apiToken);
+    $operations = $client->getOperations();
+
+    // Задаем период
+    $from = Carbon::now()->subYear();
+    $to = Carbon::now();
+
+    // Получаем операции за указанный промежуток времени
+    $byDates = $operations->getByDateRange($accountId, $from, $to);
+    foreach ($byDates as $operation) {
+        echo 'Operation ID: ' . $operation->id . ' | Тип: ' . $operation->type . PHP_EOL;
+    }
+} catch (TinkoffApiException $e) {
+    echo 'Ошибка при работе с операциями: ' . $e->getMessage();
+}
+```
+
+##### [Получение операций через ресурс Account](#получение-операций-через-ресурс-account)
 
 ```php
 <?php
@@ -139,36 +221,17 @@ use TinkoffFinApi\Exceptions\TinkoffApiException;
 
 $apiToken = 'YOUR_API_TOKEN_HERE';
 $operationId = 'YOUR_OPERATION_ID';
-$accountId = 'YOUR_ACCOUNT_ID';
 
 try {
     $client = new TinkoffFinApiClient($apiToken);
 
-    // Получаем ресурс операций
-    $operations = $client->getOperations();
+    // Получаем аккаунты
+    $accounts = $client->getAccounts();
 
-    // 1. Получение всех операций
-    foreach ($operations->all() as $operation) {
-        echo 'Operation ID: ' . $operation->id . ' | Тип: ' . $operation->type . PHP_EOL;
-    }
-
-    // 2. Получение операции по ID
-    $singleOperation = $operations->findById($operationId);
-    if ($singleOperation) {
-        echo 'Найдена операция: ' . $singleOperation->id . PHP_EOL;
-    }
-
-    // 3. Получение операций за период
+    // Срез дат
     $from = Carbon::now()->subYear();
     $to = Carbon::now();
-    $byDates = $operations->getByDateRange($accountId, $from, $to);
 
-    foreach ($byDates as $operation) {
-        echo '[Date Range] Operation ID: ' . $operation->id . ' | Тип: ' . $operation->type . PHP_EOL;
-    }
-
-    // 4. Получение операций через ресурс Account
-    $accounts = $client->getAccounts();
     foreach ($accounts->all() as $account) {
         // a) Все операции по счету
         $accountOperations = $account->getAllOperations();
@@ -224,8 +287,7 @@ try {
 ];
 ```
 
-3. При необходимости опубликуйте и отредактируйте конфигурационный файл (если библиотека предоставляет его). После этого
-   все ресурсы библиотеки доступны через IoC-контейнер Laravel.
+3. При необходимости опубликуйте и отредактируйте конфигурационный файл (если библиотека предоставляет его). После этого все ресурсы библиотеки доступны через IoC-контейнер Laravel.
 
 ---
 
@@ -270,11 +332,16 @@ TinkoffFinApi/
 
 ## Тестирование
 
-Для запуска тестов выполните команду (убедитесь, что [PHPUnit](https://packagist.org/packages/phpunit/phpunit)
-установлен):
+Для запуска тестов выполните команду (убедитесь, что [PHPUnit](https://packagist.org/packages/phpunit/phpunit) установлен):
 
 ```bash
-./test-tinkoff-api
+./vendor/bin/phpunit
+```
+
+Или используйте скрипты из `composer.json`, например:
+
+```bash
+composer test-tinkoff-api
 ```
 
 Убедитесь, что ваше окружение настроено корректно, чтобы все тесты проходили без ошибок.
@@ -283,6 +350,5 @@ TinkoffFinApi/
 
 ## Лицензия
 
-Данная библиотека распространяется на условиях лицензии MIT. Полный текст лицензии можно найти в файле `LICENSE` в корне
-проекта или по ссылке в репозитории.
+Данная библиотека распространяется на условиях лицензии MIT. Полный текст лицензии можно найти в файле `LICENSE` в корне проекта или по ссылке в репозитории.
 
