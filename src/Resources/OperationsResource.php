@@ -87,11 +87,9 @@ class OperationsResource extends AbstractResource
                 ->wait(),
             );
 
-            // Используем конструкцию match для проверки статуса и выбрасывания исключения в одну строчку
-            match ($status->code) {
-                0 => null,
-                default => throw new TinkoffApiException("Error code: {$status->code}"),
-            };
+            if ($status->code !== 0) {
+                throw new TinkoffApiException("Error code: {$status->code}, msg: {$status->message}");
+            }
 
             // Обрабатываем полученные операции
             foreach ($response->getItems() as $op) {

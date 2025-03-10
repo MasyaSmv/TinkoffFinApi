@@ -12,6 +12,9 @@ abstract class AbstractModel
 {
     protected TinkoffFinApiClient $client;
 
+    /**
+     * @param TinkoffFinApiClient $client
+     */
     public function __construct(TinkoffFinApiClient $client)
     {
         $this->client = $client;
@@ -52,12 +55,16 @@ abstract class AbstractModel
      * Например, если units = 239, а nano = 400000000, итоговое значение:
      * 239 + 400000000 / 1_000_000_000 = 239.4
      *
-     * @param MoneyValue|Quotation $moneyValue Объект с денежным значением
+     * @param MoneyValue|Quotation|null $moneyValue Объект с денежным значением
      *
-     * @return string Итоговое значение суммы в виде float + код валюты
+     * @return null|string Итоговое значение суммы в виде float + код валюты или null, если он и пришел
      */
-    protected function convertToFloat(MoneyValue|Quotation $moneyValue): string
+    protected function convertToFloat(MoneyValue|Quotation|null $moneyValue): ?string
     {
+        if (!$moneyValue) {
+            return null;
+        }
+
         // Получаем целую часть из объекта
         $units = $moneyValue->getUnits();
         // Получаем дробную часть в наносекундах

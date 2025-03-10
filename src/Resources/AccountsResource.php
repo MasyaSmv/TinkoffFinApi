@@ -27,7 +27,7 @@ class AccountsResource extends AbstractResource
         );
 
         if ($status->code !== 0) {
-            throw new TinkoffApiException("Error code {$status->code}");
+            throw new TinkoffApiException("Error code: {$status->code}, msg: {$status->message}");
         }
 
         $accounts = [];

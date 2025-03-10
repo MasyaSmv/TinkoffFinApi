@@ -7,68 +7,23 @@ use Google\Protobuf\Timestamp;
 use Tinkoff\Invest\V1\Account as GrpcAccount;
 use TinkoffFinApi\Client\TinkoffFinApiClient;
 use TinkoffFinApi\Resources\OperationsResource;
+use TinkoffFinApi\Resources\PortfoliosResource;
 
 class Account extends AbstractModel
 {
-    /**
-     * Идентификатор счёта.
-     *
-     * @var string
-     */
+    /** @var string Идентификатор счёта */
     public string $id = '';
-
-    /**
-     * AccountType    Тип счёта.
-     * ACCOUNT_TYPE_UNSPECIFIED    0    Тип аккаунта не определён.
-     * ACCOUNT_TYPE_TINKOFF    1    Брокерский счёт Тинькофф.
-     * ACCOUNT_TYPE_TINKOFF_IIS    2    ИИС счёт.
-     * ACCOUNT_TYPE_INVEST_BOX    3    Инвесткопилка.
-     *
-     * @var int
-     */
+    /** @var int Тип счёта */
     public int $type = 0;
-
-    /**
-     * Название счёта.
-     *
-     * @var string
-     */
+    /** @var string Название счёта */
     public string $name = '';
-
-    /**
-     * AccountStatus    Статус счёта.
-     * ACCOUNT_STATUS_UNSPECIFIED    0    Статус счёта не определён.
-     * ACCOUNT_STATUS_NEW    1    Новый, в процессе открытия.
-     * ACCOUNT_STATUS_OPEN    2    Открытый и активный счёт.
-     * ACCOUNT_STATUS_CLOSED    3    Закрытый счёт.
-     *
-     * @var int
-     */
+    /** @var int Статус счёта */
     public int $status = 0;
-
-    /**
-     * Дата открытия счёта
-     *
-     * @var Carbon|null
-     */
+    /** @var Carbon|null Дата открытия счёта */
     public ?Carbon $opened_date = null;
-
-    /**
-     * Дата закрытия счёта
-     *
-     * @var Carbon|null
-     */
+    /** @var Carbon|null Дата закрытия счёта */
     public ?Carbon $closed_date = null;
-
-    /**
-     * AccessLevel    Уровень доступа к текущему счёту (определяется токеном).
-     * ACCOUNT_ACCESS_LEVEL_UNSPECIFIED    0    Уровень доступа не определён.
-     * ACCOUNT_ACCESS_LEVEL_FULL_ACCESS    1    Полный доступ к счёту.
-     * ACCOUNT_ACCESS_LEVEL_READ_ONLY    2    Доступ с уровнем прав "только чтение".
-     * ACCOUNT_ACCESS_LEVEL_NO_ACCESS    3    Доступ отсутствует.
-     *
-     * @var int
-     */
+    /** @var int Уровень доступа к текущему счёту (определяется токеном) */
     public int $access_level = 0;
 
     /**
@@ -117,6 +72,18 @@ class Account extends AbstractModel
     }
 
     /**
+     * Получение портфеля счета 
+     * 
+     * @return Portfolio|null
+     */
+    public function getPortfolio(): ?Portfolio
+    {
+        return (new PortfoliosResource($this->client))->findById($this->id);
+    }
+
+    /**
+     * Получение всех операций счета по срезу дат
+     * 
      * @param Carbon|null $from
      * @param Carbon|null $to
      *
