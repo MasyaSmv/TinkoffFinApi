@@ -10,6 +10,7 @@ use TinkoffFinApi\Exceptions\TinkoffTokenException;
 use TinkoffFinApi\Resources\AccountsResource;
 use TinkoffFinApi\Resources\OperationsResource;
 use Exception;
+use TinkoffFinApi\Resources\PortfoliosResource;
 
 class TinkoffFinApiClient implements ClientContract
 {
@@ -54,6 +55,16 @@ class TinkoffFinApiClient implements ClientContract
     public function getOperations(): OperationsResource
     {
         return new OperationsResource($this);
+    }
+
+    /**
+     * Возвращает все операции полученные от Тинькофф Апи
+     *
+     * @return PortfoliosResource
+     */
+    public function getPortfolios(): PortfoliosResource
+    {
+        return new PortfoliosResource($this);
     }
 
     /**
