@@ -114,6 +114,7 @@ class Operation extends AbstractModel
         $this->type = $op->getType();
         $this->description = $op->getDescription();
         $this->state = $op->getState();
+        $this->status = $op->getState();
         $this->instrument_uid = $op->getInstrumentUid();
         $this->figi = $op->getFigi();
         $this->instrument_type = $op->getInstrumentType();
