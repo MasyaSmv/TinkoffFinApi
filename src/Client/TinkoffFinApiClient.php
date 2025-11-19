@@ -8,6 +8,7 @@ use TinkoffFinApi\Contracts\ClientContract;
 use TinkoffFinApi\Exceptions\TinkoffApiException;
 use TinkoffFinApi\Exceptions\TinkoffTokenException;
 use TinkoffFinApi\Resources\AccountsResource;
+use TinkoffFinApi\Resources\CandlesResource;
 use TinkoffFinApi\Resources\OperationsResource;
 use Exception;
 use TinkoffFinApi\Resources\PortfoliosResource;
@@ -58,13 +59,23 @@ class TinkoffFinApiClient implements ClientContract
     }
 
     /**
-     * Возвращает все операции полученные от Тинькофф Апи
+     * Возвращает портфели полученные от Тинькофф Апи
      *
      * @return PortfoliosResource
      */
     public function getPortfolios(): PortfoliosResource
     {
         return new PortfoliosResource($this);
+    }
+
+    /**
+     * Возвращает ресурс для работы со свечами рынка
+     *
+     * @return CandlesResource
+     */
+    public function getCandles(): CandlesResource
+    {
+        return new CandlesResource($this);
     }
 
     /**
