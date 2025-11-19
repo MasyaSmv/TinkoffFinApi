@@ -23,6 +23,7 @@ TinkoffFinApi — это PHP-библиотека, упрощающая рабо
         - [Работа с портфелями](#работа-с-портфелями)
             - [Получение всех портфелей](#получение-всех-портфелей)
             - [Получение портфеля по ID счета](#получение-портфеля-по-id-счета)
+        - [Работа со свечами](#работа-со-свечами)
 - [Обработка ошибок](#обработка-ошибок)
 - [Интеграция с Laravel](#интеграция-с-laravel)
 - [Структура проекта](#структура-проекта)
@@ -315,6 +316,38 @@ try {
     echo 'Ошибка при работе с портфелями: ' . $e->getMessage();
 }
 ```
+
+#### [Работа со свечами](#работа-со-свечами)
+
+```php
+<?php
+use Carbon\Carbon;
+use Tinkoff\Invest\V1\CandleInterval;
+use TinkoffFinApi\Client\TinkoffFinApiClient;
+
+$apiToken = 'YOUR_API_TOKEN_HERE';
+
+$client = new TinkoffFinApiClient($apiToken);
+
+$candles = $client->getCandles()->all([
+    'figi' => 'BBG000B9XRY4',
+    'from' => Carbon::now()->subDay(),
+    'to' => Carbon::now(),
+    'interval' => CandleInterval::CANDLE_INTERVAL_1_MIN,
+]);
+
+foreach ($candles as $candle) {
+    echo sprintf(
+        "%s | open: %s | close: %s | volume: %s" . PHP_EOL,
+        $candle->time?->toDateTimeString(),
+        $candle->open,
+        $candle->close,
+        $candle->volume
+    );
+}
+```
+
+> Минимальный набор фильтров: идентификатор инструмента (`figi`, `instrumentId` или `instrumentUid`), даты `from`/`to` и таймфрейм `interval`.
 
 ---
 
